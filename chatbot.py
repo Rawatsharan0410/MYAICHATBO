@@ -4,7 +4,6 @@ import requests
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Required to use session for storing history
 
-# Google API details
 API_KEY = "AIzaSyDqXHiorPGyzpRBCLF_drvWwBHlEdu1yho"
 CSE_ID = "64d9f57dd8afd493f"
 
@@ -16,7 +15,7 @@ def google_search(query):
 
         if "items" not in results:
             return "No results found."
-
+    
         response_text = ""
         for item in results["items"][:3]:
             title = item["title"]
@@ -34,72 +33,36 @@ homepage_template = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome to QueryBot</title>
+    <title>QueryBot</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
+            text-align: center;
             background-color: #000;
             color: #fff;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 250px;
-            text-align: center;
+            padding: 0;
         }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid #444;
+        .container {
+            padding-top: 15%;
         }
-        .header a {
-            color: #fff;
+        a {
             text-decoration: none;
-            margin-right: 15px;
+            color: white;
         }
-        .header a:hover {
+        a:hover {
             text-decoration: underline;
-        }
-        .main {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 80vh;
-            text-align: center;
-        }
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-        }
-        .btn-container {
-            margin-top: 20px;
-        }
-        .btn-container a {
-            margin: 5px;
-            padding: 10px 20px;
-            color: #000;
-            background-color: #fff;
-            border: none;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .btn-container a:hover {
-            background-color: #ddd;
         }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>Welcome to QueryBot</h1>
-    <p>Explore the chatbot to get responses.</p>
-    <br>
-    <p>Developed By Sharan Rawat</p> <br>
-    <a href="{{ url_for('chatbot') }}" class="btn btn-primary">Go to Chatbot</a>
-</div>
-
+    <div class="container">
+        <h1>Welcome to QueryBot</h1>
+        <p>Making your questions smarter and your searches more intuitive, one query at a time. With every search, we aim to simplify the journey from curiosity to discovery, ensuring precision, clarity, and relevance in the answers you seek. This platform is a testament to the power of innovation and passion, designed to transform the way you access information. Whether you’re exploring new ideas or diving deep into a topic, we’re here to empower your searches with intelligence and ease, all while providing an engaging, user-friendly experience.</p>
+        <p>Developed by Sharan Rawat</p>
+        <a href="{{ url_for('chatbot') }}" class="btn btn-primary">Go to Chatbot</a>
+    </div>
 </body>
 </html>
 """
@@ -108,187 +71,153 @@ chatbot_template = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>QueryBot</title>
+    <title>QueryBot Chat</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* Light text */
             margin: 0;
             padding: 0;
+        }
+        .header {
+            text-align: center;
+            padding: 10px;
+            background-color: #1f1f1f; /* Darker header */
+            color: #ffffff;
+        }
+        .chat-container {
             display: flex;
+            flex-wrap: wrap;
             height: 100vh;
             overflow: hidden;
         }
-
         .sidebar {
-            width: 260px;
-            background-color: #f1f1f1;
+            width: 25%;
+            background-color: #1f1f1f; /* Dark sidebar */
             padding: 20px;
+            border-right: 1px solid #333333;
+            height: 100%;
             overflow-y: auto;
-            border-right: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
         }
-
-        .sidebar h4 {
-            margin: 0 0 10px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .sidebar-item {
-            padding: 8px 0;
-            color: #333;
-            border-bottom: 1px solid #ddd;
-            cursor: pointer;
-            font-size: 0.95em;
-            transition: background-color 0.3s;
-        }
-
-        .sidebar-item:hover {
-            background-color: #e9ecef;
-        }
-
-        .container {
+        .content {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            color: #333;
+            padding: 20px;
             overflow-y: auto;
         }
-
-        h2 {
-            font-size: 2em;
-            color: #333;
-            font-weight: bold;
-            text-align: center;
+        .history-item {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #333333;
+            padding: 10px 5px;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 4px;
         }
-
+        .history-item:hover {
+            background-color: #333333;
+        }
         .results {
-            text-align: left;
-            width: 100%;
-            max-width: 600px;
-            margin: 20px 0;
-            padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ddd;
+            padding: 15px;
+            border: 1px solid #333333;
+            background-color: #1f1f1f;
+            color: #ffffff;
+            margin-bottom: 20px;
             border-radius: 8px;
         }
-
         .footer-form {
-            width: 100%;
-            max-width: 800px;
             display: flex;
-            justify-content: center;
-            align-items: center;
             margin-top: 20px;
         }
-
         .footer-form input {
-            width: 85%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 24px;
-            font-size: 1em;
+            flex: 1;
+            padding: 10px;
             margin-right: 10px;
+            border-radius: 20px;
+            border: 1px solid #333333;
+            background-color: #333333;
+            color: #ffffff;
         }
-
         .footer-form button {
-            padding: 10px 20px;
             background-color: #007bff;
-            color: #fff;
+            color: #ffffff;
             border: none;
-            border-radius: 24px;
-            font-size: 1em;
+            padding: 10px 20px;
+            border-radius: 20px;
             cursor: pointer;
         }
-
-        .clear-history {
+        .footer-form button:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
             background-color: #dc3545;
-            color: #fff;
             border: none;
-            padding: 8px 16px;
-            border-radius: 24px;
-            cursor: pointer;
-            margin-bottom: 10px;
-            align-self: center;
         }
-
-        /* Responsive layout */
+        .btn-danger:hover {
+            background-color: #a71d2a;
+        }
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #444444;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #555555;
+        }
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
                 border-right: none;
-                border-bottom: 1px solid #ddd;
+                border-bottom: 1px solid #333333;
+            }
+            .content {
                 padding: 10px;
-            }
-            
-            .container {
-                padding: 20px;
-            }
-
-            .footer-form input {
-                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-
-<div class="sidebar">
-    <h4>Chat History</h4>
-    {% if history %}
-        {% for item in history %}
-            <div class="sidebar-item" onclick="loadChat('{{ item['query'] }}', '{{ item['response'] }}')">
-                {{ item['query'] }}
+    <div class="header">
+        <h2>QueryBot</h2>
+    </div>
+    <div class="chat-container">
+        <div class="sidebar">
+            <h4>Chat History</h4>
+            {% if history %}
+                {% for item in history %}
+                <div class="history-item">
+                    <strong>Query:</strong> {{ item['query'] }}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No history available.</p>
+            {% endif %}
+            <form action="{{ url_for('clear_history') }}" method="POST">
+                <button type="submit" class="btn btn-danger btn-sm">Clear History</button>
+            </form>
+        </div>
+        <div class="content">
+            <h3>How can I help you today?</h3>
+            {% if response %}
+            <div class="results">
+                {{ response | safe }}
             </div>
-        {% endfor %}
-    {% else %}
-        <p>No history available.</p>
-    {% endif %}
-    <form action="{{ url_for('clear_history') }}" method="POST">
-        <button type="submit" class="clear-history">Clear Chat History</button>
-    </form>
-</div>
-
-<div class="container">
-    <h2>What can I help with?</h2>
-    
-    {% if response %}
-    <div class="results">
-        <h4>Results:</h4>
-        <p>{{ response | safe }}</p>
+            {% endif %}
+            <form method="POST" class="footer-form">
+                <input type="text" name="query" placeholder="Type your query..." required>
+                <button type="submit">Search</button>
+            </form>
+        </div>
     </div>
-    {% endif %}
-
-    <div class="footer-form">
-        <form method="POST">
-            <input type="text" name="query" placeholder="Message QueryBot" required>
-            <button type="submit">Send</button>
-        </form>
-    </div>
-</div>
-
-<script>
-    function loadChat(query, response) {
-        alert("Query: " + query + "\\nResponse: " + response);
-    }
-</script>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 """
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def homepage():
     return render_template_string(homepage_template)
 
@@ -299,18 +228,17 @@ def chatbot():
 
     response = ""
     if request.method == "POST":
-        user_query = request.form.get("query")
-        response = google_search(user_query)
+        query = request.form.get("query")
+        if query:
+            response = google_search(query)
+            session["history"].append({"query": query, "response": response})
+            session.modified = True
 
-        # Save query and response in history
-        session["history"].append({"query": user_query, "response": response})
-        session.modified = True  # Ensure session is updated
-
-    return render_template_string(chatbot_template, response=response, history=session["history"])
+    return render_template_string(chatbot_template, history=session["history"], response=response)
 
 @app.route("/clear_history", methods=["POST"])
 def clear_history():
-    session.pop("history", None)  # Clear chat history from the session
+    session.pop("history", None)
     return redirect(url_for("chatbot"))
 
 if __name__ == "__main__":
