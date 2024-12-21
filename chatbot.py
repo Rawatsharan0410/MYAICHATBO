@@ -34,35 +34,49 @@ homepage_template = """
 <html>
 <head>
     <title>QueryBot</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         body {
             text-align: center;
-            background-color: #000;
-            color: #fff;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: #ffffff;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
         .container {
-            padding-top: 15%;
+            padding-top: 10%;
         }
         a {
             text-decoration: none;
-            color: white;
+            color: #ffffff;
         }
         a:hover {
             text-decoration: underline;
         }
+        .btn-primary {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            animation: fadeInUp 1s ease-in-out;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to QueryBot</h1>
-        <p>Making your questions smarter and your searches more intuitive, one query at a time. With every search, we aim to simplify the journey from curiosity to discovery, ensuring precision, clarity, and relevance in the answers you seek. This platform is a testament to the power of innovation and passion, designed to transform the way you access information. Whether you’re exploring new ideas or diving deep into a topic, we’re here to empower your searches with intelligence and ease, all while providing an engaging, user-friendly experience.</p>
-        <p>Developed by Sharan Rawat</p>
+    <div class="container animate__animated animate__fadeIn">
+        <h1 class="display-4">Welcome to QueryBot</h1>
+        <p class="lead">Your smart companion for intuitive and precise searches. Dive deep into topics or explore new ideas with ease.</p>
+        <p>Developed by <strong>Sharan Rawat</strong></p>
         <a href="{{ url_for('chatbot') }}" class="btn btn-primary">Go to Chatbot</a>
     </div>
+    <script>
+        gsap.from(".display-4", {duration: 1, y: -50, opacity: 0, ease: "power3.out"});
+        gsap.from(".lead", {duration: 1.5, x: -100, opacity: 0, ease: "power3.out", delay: 0.5});
+        gsap.from(".btn-primary", {duration: 2, scale: 0.5, opacity: 0, ease: "elastic", delay: 1});
+    </script>
 </body>
 </html>
 """
@@ -72,7 +86,9 @@ chatbot_template = """
 <html>
 <head>
     <title>QueryBot Chat</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -80,11 +96,12 @@ chatbot_template = """
             color: #ffffff; /* Light text */
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
         .header {
             text-align: center;
             padding: 10px;
-            background-color: #1f1f1f; /* Darker header */
+            background: linear-gradient(135deg, #1f1f1f, #333333);
             color: #ffffff;
         }
         .chat-container {
@@ -124,6 +141,7 @@ chatbot_template = """
             color: #ffffff;
             margin-bottom: 20px;
             border-radius: 8px;
+            animation: fadeIn 0.5s ease-in-out;
         }
         .footer-form {
             display: flex;
@@ -181,33 +199,33 @@ chatbot_template = """
     </style>
 </head>
 <body>
-    <div class="header">
+    <div class="header animate__animated animate__fadeInDown">
         <h2>QueryBot</h2>
     </div>
     <div class="chat-container">
         <div class="sidebar">
-            <h4>Chat History</h4>
+            <h4 class="animate__animated animate__fadeInLeft">Chat History</h4>
             {% if history %}
                 {% for item in history %}
-                <div class="history-item">
+                <div class="history-item animate__animated animate__fadeInLeft animate__delay-1s">
                     <strong>Query:</strong> {{ item['query'] }}
                 </div>
                 {% endfor %}
             {% else %}
-                <p>No history available.</p>
+                <p class="animate__animated animate__fadeIn">No history available.</p>
             {% endif %}
             <form action="{{ url_for('clear_history') }}" method="POST">
-                <button type="submit" class="btn btn-danger btn-sm">Clear History</button>
+                <button type="submit" class="btn btn-danger btn-sm animate__animated animate__fadeIn">Clear History</button>
             </form>
         </div>
         <div class="content">
-            <h3>How can I help you today?</h3>
+            <h3 class="animate__animated animate__fadeInRight">How can I help you today?</h3>
             {% if response %}
-            <div class="results">
+            <div class="results animate__animated animate__fadeInUp">
                 {{ response | safe }}
             </div>
             {% endif %}
-            <form method="POST" class="footer-form">
+            <form method="POST" class="footer-form animate__animated animate__fadeInUp animate__delay-1s">
                 <input type="text" name="query" placeholder="Type your query..." required>
                 <button type="submit">Search</button>
             </form>
@@ -216,6 +234,8 @@ chatbot_template = """
 </body>
 </html>
 """
+
+
 
 @app.route("/", methods=["GET"])
 def homepage():
